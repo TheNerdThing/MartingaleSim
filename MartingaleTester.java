@@ -15,13 +15,14 @@ public class MartingaleTester {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		final int WIN_ON = 40; // player will win if the number rolled is greater than this
+		final int WIN_ON = 49; // player will win if the number rolled is greater than this
 		final int MAX_ROLL = 100; // math.random will select this for a max. 
 		final int STARTING_BANKROLL = 10000;
 		final int STARTING_BET = 5;
 		final int TRIALS_TO_RUN = 10000;
 		final int TABLE_MAX = 1000;
 		final int END_GOAL = (int)(STARTING_BANKROLL * 2);
+		final boolean MARTINGALE = false;
 		
 		int bankRoll = STARTING_BANKROLL; 
 		int currentBet = STARTING_BET;
@@ -29,6 +30,7 @@ public class MartingaleTester {
 		int bustoCount = 0; 
 		int[] data = new int[TRIALS_TO_RUN];
 		int retierCount = 0;
+		int playerwins =0;
 		while(bustoCount < TRIALS_TO_RUN) {
 			do {
 				//wager bet
@@ -37,17 +39,20 @@ public class MartingaleTester {
 				int roll = (int)((Math.random() * MAX_ROLL)) -1;
 				count ++;
 				//did the player win? 
-				if(roll > WIN_ON) {
+				if(roll >= WIN_ON) {
 					// add 2x his current bet and set the current bet to starting bet
 					bankRoll += currentBet *2;
 					currentBet = STARTING_BET;
+					playerwins ++;
 					if(currentBet > TABLE_MAX) {
 						currentBet =TABLE_MAX;
 					}
 //					System.out.print("player has won the wager! ");
 				}else {
-					// on loss, double the bet
-					currentBet = currentBet *2;
+					// on loss, double the bet if we are running using martingale
+					if(MARTINGALE)
+						currentBet = currentBet *2;
+					
 //					System.out.print("player has lost the wager! ");
 				}
 				// print the results
@@ -71,6 +76,8 @@ public class MartingaleTester {
 		int over50 = 0;
 		int under50 = 0;
 		
+		int totalGames =0;
+		
 		for(int i = 0; i<data.length; i++) {
 			int use = data[i];
 			System.out.println(use);
@@ -86,6 +93,7 @@ public class MartingaleTester {
 			}else {
 				over1k++;
 			}
+			totalGames += use;
 		}
 		System.out.println(" number of trials over 1,000 	: " + ((double) over1k / TRIALS_TO_RUN));
 		System.out.println(" number of trials over 500   	: " + ((double) over500 / TRIALS_TO_RUN));
@@ -93,5 +101,6 @@ public class MartingaleTester {
 		System.out.println(" number of trials over 50       : " + ((double) over50 / TRIALS_TO_RUN));
 		System.out.println(" number of trials less than 50  : " + ((double) under50 / TRIALS_TO_RUN));
 		System.out.println(" the player met his goal : " + retierCount + " player retire rate is : " + ((double) retierCount /TRIALS_TO_RUN));
+		System.out.println("the player's winrate is:  " + (double) playerwins/totalGames + " ( " + playerwins + "  wins total)" + "( " + totalGames + " games total)") ;
 	}
 }
